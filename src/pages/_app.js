@@ -1,14 +1,13 @@
 // pages/_app.js
 import { useEffect, useState } from 'react';
 import Layout from '../../components/Layout';
+import NetflixLoader from '../../components/NetflixLoader';
 import '../styles/global.css';
-
 
 function MyApp({ Component, pageProps }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Preloader logic - only run on client side
     if (typeof window !== 'undefined') {
       const preloader = document.querySelector('.preloader');
       if (preloader) {
@@ -19,20 +18,21 @@ function MyApp({ Component, pageProps }) {
       } else {
         setIsLoading(false);
       }
-    } else {
-      setIsLoading(false);
     }
   }, []);
 
   return (
-    <Layout>
+    <>
       {isLoading && (
         <div className="preloader">
           <div className="loader"></div>
         </div>
       )}
-      <Component {...pageProps} />
-    </Layout>
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
+      <NetflixLoader />
+    </>
   );
 }
 

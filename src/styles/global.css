@@ -2811,3 +2811,111 @@ footer::before {
   transform: scale(1.03);
   box-shadow: 0 4px 12px rgba(0,0,0,0.25);
 }
+
+.netflixLoader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  transition: opacity 0.5s ease-out;
+}
+
+.netflixLoader.fadeOut {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.netflixAnimation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.netflixLogo {
+  display: flex;
+  gap: 0.2rem;
+}
+
+.logoLetter {
+  font-size: 4rem;
+  font-weight: 900;
+  color: #e50914; /* Netflix red */
+  opacity: 0;
+  transform: translateY(20px);
+  animation: letterReveal 0.5s forwards;
+}
+
+.logoLetter:nth-child(1) { animation-delay: 0.1s; }
+.logoLetter:nth-child(2) { animation-delay: 0.2s; }
+.logoLetter:nth-child(3) { animation-delay: 0.3s; }
+.logoLetter:nth-child(4) { animation-delay: 0.4s; }
+.logoLetter:nth-child(5) { animation-delay: 0.5s; }
+.logoLetter:nth-child(6) { animation-delay: 0.6s; }
+.logoLetter:nth-child(7) { animation-delay: 0.7s; }
+
+@keyframes letterReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.loadingBar {
+  width: 200px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress {
+  height: 100%;
+  width: 0;
+  background: #e50914; /* Netflix red */
+  animation: loading 2s ease-in-out forwards;
+}
+
+@keyframes loading {
+  0% {
+    width: 0;
+  }
+  70% {
+    width: 90%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .logoLetter {
+    font-size: 3rem;
+  }
+  
+  .loadingBar {
+    width: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logoLetter {
+    font-size: 2.5rem;
+  }
+  
+  .netflixLogo {
+    gap: 0.1rem;
+  }
+}
+
