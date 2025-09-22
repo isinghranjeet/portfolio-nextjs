@@ -8,26 +8,27 @@ const Projects = () => {
   const projects = [
     {
       id: 1,
-      title: "E-Commerce Website",
-      description: "A fully responsive e-commerce platform with product filtering, cart functionality, and payment integration.",
+      title: "School Management System",
+      description: "A fully School Management System and payment integration.",
       image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1172&q=80",
       technologies: ["React", "Node.js", "MongoDB", "Stripe"],
       category: "web",
       links: {
-        view: "#",
-        demo: "#"
+        view:  "https://github.com/isinghranjeet/School",
+        demo: "https://school-taupe-eight.vercel.app/"
       }
     },
     {
       id: 2,
-      title: "Task Management App",
+      title: "Online Exam Portal",
       description: "A productivity application that helps users organize tasks, set deadlines, and track progress.",
       image: "https://images.unsplash.com/photo-1551650975-87deedd944c3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80",
-      technologies: ["Vue.js", "Firebase", "CSS3", "Chart.js"],
+      technologies: ["Next.js", "Firebase", "CSS3", "Chart.js"],
       category: "web",
       links: {
-        view: "#",
-        demo: "#"
+        view:    "https://github.com/isinghranjeet/online-exam-app",
+           
+        demo:  "https://online-exam-19ni3881t-ranjeet-kumars-projects-ff5ee4a0.vercel.app/"
       }
     },
     {
@@ -74,8 +75,9 @@ const Projects = () => {
       technologies: ["Flutter", "Firebase", "Google Maps API", "Payment Gateway"],
       category: "mobile",
       links: {
-        view: "#",
-        demo: "#"
+        view:  "https://github.com/isinghranjeet/Food-Dilivery-App",
+        
+        demo: "https://lively-faloodeh-f07528.netlify.app/"
       }
     },
     {
@@ -98,20 +100,22 @@ const Projects = () => {
       technologies: ["Angular", "Spring Boot", "MySQL", "WebRTC"],
       category: "web",
       links: {
-        view: "#",
-        demo: "#"
+        view:  "https://github.com/isinghranjeet/Patient-Management-System",
+
+        demo: "https://effulgent-pithivier-cbc3f0.netlify.app/"
+       
       }
     },
     {
       id: 9,
-      title: "Real Estate Listing Platform",
-      description: "Modern property listing platform with advanced search filters, virtual tours, and agent connection features.",
+      title: "Ambulance Route Optimazition",
+      description: "Modern  platform with advanced search filters, virtual Ambulance And Asist Best Path.",
       image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1073&q=80",
       technologies: ["React", "Node.js", "MongoDB", "Google Maps API"],
       category: "design",
       links: {
-        view: "#",
-        demo: "#"
+        view: "https://github.com/isinghranjeet/Delhi-Ambulance-route-Optimization",
+        demo: "https://github.com/isinghranjeet/Delhi-Ambulance-route-Optimization"
       }
     },
     {
