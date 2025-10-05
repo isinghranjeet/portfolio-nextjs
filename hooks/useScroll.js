@@ -1,57 +1,60 @@
-import { useState, useEffect } from 'react';
-
-const useScroll = ({
-  threshold = 100,           // custom scroll threshold
-  onThresholdCross = null,   // optional callback when threshold is crossed
-  throttleDelay = 100        // throttle delay in ms
-} = {}) => {
-  const [scrollY, setScrollY] = useState(0);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [scrollDirection, setScrollDirection] = useState(null); // "up" or "down"
-
-  useEffect(() => {
-    let lastScrollY = window.scrollY;
-    let timeoutId = null;
-
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-
-      // Detect direction
-      setScrollDirection(currentScrollY > lastScrollY ? 'down' : 'up');
-
-      // Update scrollY state
-      setScrollY(currentScrollY);
-
-      // Check threshold
-      const scrolledPast = currentScrollY > threshold;
-      if (scrolledPast !== isScrolled) {
-        setIsScrolled(scrolledPast);
-        if (onThresholdCross) onThresholdCross(scrolledPast); // call callback
-      }
-
-      lastScrollY = currentScrollY;
-    };
-
-    const throttledScroll = () => {
-      if (timeoutId === null) {
-        timeoutId = setTimeout(() => {
-          handleScroll();
-          timeoutId = null;
-        }, throttleDelay);
-      }
-    };
-
-    // Initial scroll position
-    handleScroll();
-
-    window.addEventListener('scroll', throttledScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener('scroll', throttledScroll);
-    };
-  }, [isScrolled, threshold, onThresholdCross, throttleDelay]);
-
-  return { scrollY, isScrolled, scrollDirection };
+// Basic usage
+const Header = () => {
+  const { isScrolled, scrollDirection } = useScroll({ threshold: 50 });
+  
+  return (
+    <header className={`header ${isScrolled ? 'scrolled' : ''} ${scrollDirection === 'down' ? 'hide' : 'show'}`}>
+      {/* Header content */}
+    </header>
+  );
 };
 
-export default useScroll;
+// Advanced usage with progress tracking
+const ProgressIndicator = () => {
+  const { scrollProgress, isScrolling } = useScroll({
+    enableProgressTracking: true,
+    debounceScrollEnd: true
+  });
+
+  return (
+    <div className={`progress-bar ${isScrolling ? 'visible' : ''}`}>
+      <div 
+        className="progress-fill" 
+        style={{ width: `${scrollProgress}%` }}
+      />
+    </div>
+  );
+};
+
+// Using scroll methods
+const Navigation = () => {
+  const { scrollToElement, scrollToTop } = useScroll();
+
+  return (
+    <nav>
+      <button onClick={() => scrollToTop()}>Top</button>
+      <button onClick={() => scrollToElement('about', 100)}>About</button>
+      <button onClick={() => scrollToElement('contact')}>Contact</button>
+    </nav>
+  );
+};
+
+// Using scroll spy
+const TableOfContents = () => {
+  const sections = ['intro', 'about', 'projects', 'contact'];
+  const activeSection = useScrollSpy(sections);
+
+  return (
+    <div className="toc">
+      {sections.map(section => (
+        <a
+          key={section}
+          href={`#${section}`}
+          className={activeSection === section ? 'active' : ''}
+        >
+          {section}
+        </a>
+      ))}
+    </div>
+  );
+};
