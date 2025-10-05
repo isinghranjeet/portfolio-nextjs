@@ -112,12 +112,6 @@ npm install
 cp .env.example .env.local
 ```
 
-Edit `.env.local`:
-```env
-NEXT_PUBLIC_API_URL=http://localhost:5000/api
-NEXT_PUBLIC_APP_NAME=My Portfolio
-NEXT_PUBLIC_EMAIL=your-email@example.com
-```
 
 ### 3. Backend Setup
 ```bash
