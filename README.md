@@ -133,14 +133,8 @@ cp .env.example .env
 
 Edit `.env`:
 ```env
-PORT=5000
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/portfolio
-CLIENT_URL=http://localhost:3000
-EMAIL_SERVICE=gmail
-EMAIL_USER=your-email@gmail.com
-EMAIL_PASS=your-app-password
-JWT_SECRET=your-secret-key
-```
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/portfolio
+
 
 ### 4. Start Development Servers
 
