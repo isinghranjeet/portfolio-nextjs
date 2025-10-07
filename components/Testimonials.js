@@ -47,7 +47,7 @@ const Testimonials = () => {
     }
   ];
 
-  // ✅ BETTER IMAGE ERROR HANDLER
+  // ✅ CORRECTED IMAGE ERROR HANDLER
   const handleImageError = (e, testimonialId, originalSrc) => {
     console.log(`❌ Image failed for testimonial ${testimonialId}, using fallback`);
     
@@ -58,20 +58,25 @@ const Testimonials = () => {
     e.target.onerror = null;
   };
 
-  // ✅ GET CORRECT IMAGE URL - UPDATED VERSION
+  // ✅ CORRECTED GET IMAGE URL FUNCTION
   const getImageUrl = (item) => {
     console.log('🖼️ Processing image for:', item.name, item);
 
-    // ✅ OPTION 1: If user uploaded actual photo - Use the UPLOADED image
-    if (item.profileImage && item.profileImage.filename) {
+    // ✅ OPTION 1: If user uploaded actual photo - Check the correct field name
+    if (item.profileImage && typeof item.profileImage === 'object' && item.profileImage.filename) {
       const uploadedImageUrl = `https://porthfolio-backend-1.onrender.com/uploads/${item.profileImage.filename}`;
       console.log('📍 Using UPLOADED PROFILE IMAGE:', uploadedImageUrl);
       return uploadedImageUrl;
     }
 
-    // ✅ OPTION 2: Use Gravatar (if available)
+    // ✅ OPTION 2: Use Gravatar (check both gravatarUrl and imageUrl fields)
+    if (item.gravatarUrl && item.gravatarUrl.includes('gravatar.com')) {
+      console.log('📍 Using GRAVATAR URL:', item.gravatarUrl);
+      return item.gravatarUrl;
+    }
+
     if (item.imageUrl && item.imageUrl.includes('gravatar.com')) {
-      console.log('📍 Using GRAVATAR URL:', item.imageUrl);
+      console.log('📍 Using IMAGE URL (gravatar):', item.imageUrl);
       return item.imageUrl;
     }
 
@@ -110,9 +115,10 @@ const Testimonials = () => {
           console.log(`🔍 Processing item ${index + 1}:`, {
             id: item._id,
             name: item.name,
-            hasUploadedPhoto: !!(item.profileImage && item.profileImage.filename),
-            profileImageFilename: item.profileImage?.filename,
-            hasGravatar: !!(item.imageUrl && item.imageUrl.includes('gravatar.com'))
+            hasProfileImage: !!item.profileImage,
+            profileImageType: typeof item.profileImage,
+            profileImageDetails: item.profileImage,
+            hasGravatar: !!(item.gravatarUrl && item.gravatarUrl.includes('gravatar.com'))
           });
 
           return {
@@ -120,7 +126,9 @@ const Testimonials = () => {
             text: item.message || 'No message provided',
             author: item.name || 'Anonymous',
             role: item.subject || 'Visitor Feedback',
-            image: getImageUrl(item) // Use the correct image URL
+            image: getImageUrl(item), // Use the corrected image URL
+            // Pass the raw item for debugging
+            rawItem: item
           };
         });
         
@@ -176,7 +184,7 @@ const Testimonials = () => {
           <h2 className="section-title">What <span>People Say</span></h2>
           <div className="error-state">
             <p>Error loading testimonials: {error}</p>
-          
+            <p>Showing static testimonials only.</p>
           </div>
         </div>
       </section>
@@ -189,7 +197,7 @@ const Testimonials = () => {
         <h2 className="section-title">What <span>People Say</span></h2>
         
         <div className="testimonials-stats">
-        
+          <p>Total Testimonials: {testimonials.length} ({staticTestimonials.length} static + {testimonials.length - staticTestimonials.length} dynamic)</p>
         </div>
 
         <div className="testimonials-wrapper">
