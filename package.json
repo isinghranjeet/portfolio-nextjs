@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.1.0",
     "aos": "^2.3.4",
     "axios": "^1.12.2",
     "dotenv": "^17.2.3",

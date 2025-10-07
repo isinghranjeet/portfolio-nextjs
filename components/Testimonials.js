@@ -3,9 +3,12 @@ import useAOS from '../hooks/useAOS';
 
 const Testimonials = () => {
   useAOS();
+  const [testimonials, setTestimonials] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
 
-  const testimonials = [
+  // ✅ 5 Static testimonials
+  const staticTestimonials = [
     {
       id: 1,
       text: "Ranjeet was an exceptional student in my web development course. His projects consistently demonstrated creativity, technical skill, and attention to detail. He has a strong foundation in frontend technologies and learns quickly.",
@@ -34,57 +37,199 @@ const Testimonials = () => {
       role: "Fellow Bootcamp Participant",
       image: "https://media.licdn.com/dms/image/v2/D5603AQEFpIGrVjXuGA/profile-displayphoto-shrink_200_200/B56ZSZHrxpHoAY-/0/1737735717828?e=1759968000&v=beta&t=nzsCnen5tPXhFuD8Lw3OeNWV6qNTuWauzJFtrwSnEKA"
     },
-
-      {
-      id: 3,
-      text: "I mentored Ranjeet during his third year project on web development. He showed remarkable growth throughout the project, implementing complex features with minimal guidance. His portfolio projects reflect his passion for creating user-friendly interfaces.",
+    {
+      id: 5,
+      text: "I mentored Ranjeet during his third year project on Java development. He consistently demonstrated excellent problem-solving skills and a strong understanding of programming concepts. His projects are well-structured and reflect his dedication to learning.",
       author: "Dr. Namrata Vij",
-      role: " Project Mentor (Java)",
+      role: "Project Mentor (Java)",
       image: "https://media.licdn.com/dms/image/v2/D5603AQFNADpqwuNAdw/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1728395726028?e=1760572800&v=beta&t=3n-xoTpRRfa0wrzGpVOsywC-YEDQCqfN0nJfI9fs0L0"
-    },
+    }
   ];
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
-    }, 5000);
+    const fetchTestimonials = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/contact');
+        const data = await res.json();
+        const dynamicTestimonials = Array.isArray(data)
+          ? data.map(item => ({
+              id: item._id || `dynamic-${Math.random()}`,
+              text: item.message,
+              author: item.name,
+              role: item.subject || 'Visitor Feedback',
+              image: item.imageUrl ? `http://localhost:5000${item.imageUrl}` : item.gravatarUrl || 'https://via.placeholder.com/100'
+            }))
+          : [];
+        setTestimonials([...staticTestimonials, ...dynamicTestimonials]);
+      } catch (err) {
+        setTestimonials(staticTestimonials);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTestimonials();
+  }, []);
 
+  useEffect(() => {
+    if (!testimonials.length) return;
+    const interval = setInterval(() => setActiveIndex((prev) => (prev + 1) % testimonials.length), 5000);
     return () => clearInterval(interval);
   }, [testimonials.length]);
 
-  return (
-    <section id="testimonials" className="section testimonials">
+  const handleImageError = (e) => (e.target.src = 'https://via.placeholder.com/100/007bff/ffffff?text=👤');
+  const goToTestimonial = (i) => setActiveIndex(i);
+  const goToNext = () => setActiveIndex((prev) => (prev + 1) % testimonials.length);
+  const goToPrev = () => setActiveIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+
+  if (loading) return (
+    <section className="testimonials-section">
       <div className="container">
         <h2 className="section-title">What <span>People Say</span></h2>
-        
-        <div className="testimonials-container">
-          {testimonials.map((testimonial, index) => (
-            <div 
-              key={testimonial.id} 
-              className={`testimonial ${index === activeIndex ? 'active' : ''}`}
-            >
-              <p className="testimonial-text">{testimonial.text}</p>
+        <p>Loading testimonials...</p>
+      </div>
+    </section>
+  );
+
+  return (
+    <section className="testimonials-section">
+      <div className="container">
+        <h2 className="section-title">What <span>People Say</span></h2>
+
+        <div className="testimonials-wrapper">
+          {testimonials.map((t, idx) => (
+            <div key={t.id} className={`testimonial-card ${idx === activeIndex ? 'active' : ''}`}>
+              <p className="testimonial-text">"{t.text}"</p>
               <div className="testimonial-author">
-                <img src={testimonial.image} alt={testimonial.author} />
+                <img src={t.image} alt={t.author} onError={handleImageError} />
                 <div className="author-info">
-                  <h4>{testimonial.author}</h4>
-                  <p>{testimonial.role}</p>
+                  <h4>{t.author}</h4>
+                  <p>{t.role}</p>
                 </div>
               </div>
             </div>
           ))}
-          
-          <div className="testimonial-nav">
-            {testimonials.map((_, index) => (
-              <div 
-                key={index}
-                className={`testimonial-dot ${index === activeIndex ? 'active' : ''}`}
-                onClick={() => setActiveIndex(index)}
-              ></div>
-            ))}
-          </div>
+
+          {testimonials.length > 1 && <>
+            <button className="nav-arrow prev" onClick={goToPrev}>‹</button>
+            <button className="nav-arrow next" onClick={goToNext}>›</button>
+            <div className="testimonial-nav">
+              {testimonials.map((_, i) => (
+                <button key={i} className={`testimonial-dot ${i===activeIndex?'active':''}`} onClick={()=>goToTestimonial(i)} />
+              ))}
+            </div>
+          </>}
         </div>
       </div>
+
+      <style jsx>{`
+   .testimonials-section {
+  background: #f5f5f5; /* slightly warmer off-white */
+  padding: 4rem 0;
+  color: #333;
+  position: relative;
+}
+
+.testimonial-card {
+  display: none;
+  padding: 2rem;
+  margin: 1rem auto;
+  background: #0d1b2a; /* dark card */
+  color: #e0e0e0;
+  border-radius: 1rem;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.35); /* stronger shadow for depth */
+  text-align: center;
+  max-width: 700px;
+  transition: all 0.4s ease;
+}
+
+.testimonial-text {
+  font-style: italic;
+  margin-bottom: 1.5rem;
+  color: #cfd8dc;
+}
+
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.testimonial-author img {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: 2px solid #1f77b4;
+  object-fit: cover;
+}
+
+.author-info h4 {
+  margin: 0;
+  color: #ffffff;
+}
+
+.author-info p {
+  margin: 0;
+  color: #b0bec5;
+  font-size: 0.9rem;
+}
+
+.nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #1f77b4;
+  color: white;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.nav-arrow.prev { left: 1rem; } 
+.nav-arrow.next { right: 1rem; }
+
+.testimonial-nav {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.testimonial-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #90a4ae;
+  border: none;
+  cursor: pointer;
+}
+
+.testimonial-dot.active {
+  background: #1f77b4;
+}
+
+@media (max-width: 768px) {
+  .testimonial-author { flex-direction: column; }
+  .nav-arrow { width: 35px; height: 35px; }
+}
+
+        .testimonial-card.active { display: block; }
+        .testimonial-text { font-style: italic; margin-bottom: 1.5rem; color: #cfd8dc; }
+        .testimonial-author { display: flex; align-items: center; justify-content: center; gap: 1rem; }
+        .testimonial-author img { width: 70px; height: 70px; border-radius: 50%; border: 2px solid #1f77b4; object-fit: cover; }
+        .author-info h4 { margin:0; color:#ffffff; }
+        .author-info p { margin:0; color:#b0bec5; font-size:0.9rem; }
+        .nav-arrow { position:absolute; top:50%; transform:translateY(-50%); background:#1f77b4;color:white;width:45px;height:45px;border-radius:50%; border:none; font-size:1.5rem; cursor:pointer; }
+        .nav-arrow.prev { left:1rem; } 
+        .nav-arrow.next { right:1rem; }
+        .testimonial-nav { display:flex; justify-content:center; gap:0.5rem; margin-top:1rem; }
+        .testimonial-dot { width:12px;height:12px;border-radius:50%;background:#90a4ae; border:none; cursor:pointer; }
+        .testimonial-dot.active { background:#1f77b4; }
+        @media (max-width:768px) { .testimonial-author { flex-direction:column; } .nav-arrow { width:35px;height:35px; } }
+      `}</style>
     </section>
   );
 };

@@ -36,7 +36,7 @@ const About = () => {
     { 
       name: 'AWS Certified Developer', 
       issuer: 'Amazon', 
-      year: '2024',
+      year: '',
       icon: '☁️',
       color: '#FF9900',
       description: 'Associate level certification for AWS cloud services'
@@ -44,7 +44,7 @@ const About = () => {
     { 
       name: 'React Professional Certificate', 
       issuer: 'Meta', 
-      year: '2023',
+      year: '',
       icon: '⚛️',
       color: '#61DAFB',
       description: 'Advanced React development and best practices'
@@ -52,7 +52,7 @@ const About = () => {
     { 
       name: 'JavaScript Algorithms', 
       issuer: 'freeCodeCamp', 
-      year: '2023',
+      year: '',
       icon: '🟨',
       color: '#F7DF1E',
       description: 'Data structures and algorithms certification'
@@ -60,7 +60,7 @@ const About = () => {
     { 
       name: 'C++ Advanced Programming', 
       issuer: 'Coding Ninjas', 
-      year: '2023',
+      year: '',
       icon: '⚡',
       color: '#00599C',
       description: 'Advanced C++ and OOP concepts mastery'
@@ -68,7 +68,7 @@ const About = () => {
     { 
       name: 'SQL Mastery', 
       issuer: 'Udemy', 
-      year: '2023',
+      year: '',
       icon: '🗄️',
       color: '#336791',
       description: 'Database design and advanced query optimization'
@@ -96,10 +96,10 @@ const About = () => {
   ];
 
   const achievements = [
-    { type: 'hackathon', title: 'CodeFest 2023', result: '1st Place', year: '2023' },
-    { type: 'openSource', title: 'GitHub Contributor', result: '50+ PRs', year: '2024' },
-    { type: 'certification', title: 'Top Performer', result: '99% Score', year: '2023' },
-    { type: 'community', title: 'Tech Speaker', result: '10+ Events', year: '2024' }
+    { type: 'hackathon', title: 'CodeFest ', result: '3third Place', year: '' },
+    { type: 'openSource', title: 'GitHub Contributor', result: '50+ PRs', year: '' },
+    { type: 'certification', title: 'Top Performer', result: '99% Score', year: '' },
+    { type: 'community', title: 'Tech Speaker', result: '10+ Events', year: '' }
   ];
 
   // Function to get interest card style
