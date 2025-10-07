@@ -176,7 +176,7 @@ const Testimonials = () => {
           <h2 className="section-title">What <span>People Say</span></h2>
           <div className="error-state">
             <p>Error loading testimonials: {error}</p>
-            <p>Showing static testimonials instead.</p>
+          
           </div>
         </div>
       </section>
@@ -189,7 +189,7 @@ const Testimonials = () => {
         <h2 className="section-title">What <span>People Say</span></h2>
         
         <div className="testimonials-stats">
-          <p>Showing {testimonials.length} testimonials ({staticTestimonials.length} static + {testimonials.length - staticTestimonials.length} dynamic)</p>
+        
         </div>
 
         <div className="testimonials-wrapper">
