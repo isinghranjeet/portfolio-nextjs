@@ -49,7 +49,8 @@ const ContactForm = () => {
       submitData.append('message', formData.message);
       if (profileImage) submitData.append('profileImage', profileImage);
 
-      const response = await fetch('http://localhost:5000/api/contact', {
+      // ✅ Production backend URL
+      const response = await fetch('https://porthfolio-backend.vercel.app/api/contact', {
         method: 'POST',
         body: submitData
       });
