@@ -58,31 +58,68 @@ const Testimonials = () => {
     e.target.onerror = null;
   };
 
-  // ✅ CORRECTED GET IMAGE URL FUNCTION
+  // ✅ COMPLETELY REVISED GET IMAGE URL FUNCTION
   const getImageUrl = (item) => {
-    console.log('🖼️ Processing image for:', item.name, item);
+    console.log('🖼️ FULL ITEM DATA for image processing:', item);
 
-    // ✅ OPTION 1: If user uploaded actual photo - Check the correct field name
-    if (item.profileImage && typeof item.profileImage === 'object' && item.profileImage.filename) {
+    // ✅ OPTION 1: Check if profileImage exists and has filename
+    if (item.profileImage && item.profileImage.filename) {
       const uploadedImageUrl = `https://porthfolio-backend-1.onrender.com/uploads/${item.profileImage.filename}`;
-      console.log('📍 Using UPLOADED PROFILE IMAGE:', uploadedImageUrl);
+      console.log('📍 USING UPLOADED PROFILE IMAGE:', uploadedImageUrl);
       return uploadedImageUrl;
     }
 
-    // ✅ OPTION 2: Use Gravatar (check both gravatarUrl and imageUrl fields)
+    // ✅ OPTION 2: Check if profileImage is an object (might have different structure)
+    if (item.profileImage && typeof item.profileImage === 'object') {
+      console.log('📸 ProfileImage object found:', item.profileImage);
+      
+      // Try different possible properties in profileImage object
+      if (item.profileImage.filename) {
+        const uploadedImageUrl = `https://porthfolio-backend-1.onrender.com/uploads/${item.profileImage.filename}`;
+        console.log('📍 USING profileImage.filename:', uploadedImageUrl);
+        return uploadedImageUrl;
+      }
+      
+      if (item.profileImage.url) {
+        console.log('📍 USING profileImage.url:', item.profileImage.url);
+        return item.profileImage.url;
+      }
+      
+      if (item.profileImage.path) {
+        console.log('📍 USING profileImage.path:', item.profileImage.path);
+        return `https://porthfolio-backend-1.onrender.com${item.profileImage.path}`;
+      }
+    }
+
+    // ✅ OPTION 3: Use Gravatar URL (from gravatarUrl field)
     if (item.gravatarUrl && item.gravatarUrl.includes('gravatar.com')) {
-      console.log('📍 Using GRAVATAR URL:', item.gravatarUrl);
+      console.log('📍 USING GRAVATAR URL:', item.gravatarUrl);
       return item.gravatarUrl;
     }
 
+    // ✅ OPTION 4: Use imageUrl if available
     if (item.imageUrl && item.imageUrl.includes('gravatar.com')) {
-      console.log('📍 Using IMAGE URL (gravatar):', item.imageUrl);
+      console.log('📍 USING IMAGE URL:', item.imageUrl);
       return item.imageUrl;
     }
 
-    // ✅ OPTION 3: Fallback to default avatar
-    console.log('👤 Using DEFAULT AVATAR for:', item.name);
+    // ✅ OPTION 5: Fallback - Generate Gravatar from email
+    if (item.email) {
+      const emailHash = md5(item.email.trim().toLowerCase());
+      const generatedGravatar = `https://www.gravatar.com/avatar/${emailHash}?s=200&d=identicon`;
+      console.log('📍 GENERATED GRAVATAR from email:', generatedGravatar);
+      return generatedGravatar;
+    }
+
+    // ✅ FINAL FALLBACK: Default avatar
+    console.log('👤 USING DEFAULT AVATAR for:', item.name);
     return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjMDA3YmZmIi8+Cjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjQwIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+8J+RqDwvdGV4dD4KPC9zdmc+';
+  };
+
+  // ✅ Simple MD5 function for Gravatar
+  const md5 = (input) => {
+    // Simple implementation for demo - in production use a proper md5 library
+    return CryptoJS.MD5(input).toString();
   };
 
   useEffect(() => {
@@ -110,25 +147,26 @@ const Testimonials = () => {
         
         console.log(`📊 Found ${data.length} dynamic testimonials`);
         
-        // ✅ PROCESS DYNAMIC TESTIMONIALS WITH CORRECT IMAGE URL
+        // ✅ PROCESS DYNAMIC TESTIMONIALS WITH DEBUGGING
         const dynamicTestimonials = data.map((item, index) => {
-          console.log(`🔍 Processing item ${index + 1}:`, {
-            id: item._id,
+          console.log(`\n🔍 DETAILED ANALYSIS - Item ${index + 1}:`, {
             name: item.name,
-            hasProfileImage: !!item.profileImage,
-            profileImageType: typeof item.profileImage,
-            profileImageDetails: item.profileImage,
-            hasGravatar: !!(item.gravatarUrl && item.gravatarUrl.includes('gravatar.com'))
+            email: item.email,
+            profileImage: item.profileImage,
+            gravatarUrl: item.gravatarUrl,
+            imageUrl: item.imageUrl,
+            fullItem: item
           });
 
+          const imageUrl = getImageUrl(item);
+          
           return {
             id: item._id || `dynamic-${Date.now()}-${index}`,
             text: item.message || 'No message provided',
             author: item.name || 'Anonymous',
             role: item.subject || 'Visitor Feedback',
-            image: getImageUrl(item), // Use the corrected image URL
-            // Pass the raw item for debugging
-            rawItem: item
+            image: imageUrl,
+            rawItem: item // For debugging
           };
         });
         
@@ -150,6 +188,7 @@ const Testimonials = () => {
     fetchTestimonials();
   }, []);
 
+  // Rest of the component remains the same...
   useEffect(() => {
     if (!testimonials.length) return;
     
@@ -163,6 +202,26 @@ const Testimonials = () => {
   const goToTestimonial = (index) => setActiveIndex(index);
   const goToNext = () => setActiveIndex((prev) => (prev + 1) % testimonials.length);
   const goToPrev = () => setActiveIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+
+  // Add this debug component to see what's happening
+  const DebugInfo = () => (
+    <div style={{ background: '#fff3cd', padding: '1rem', margin: '1rem 0', borderRadius: '0.5rem', fontSize: '0.8rem' }}>
+      <h4>Debug Info:</h4>
+      <p>Total Testimonials: {testimonials.length}</p>
+      <p>Static: {staticTestimonials.length}, Dynamic: {testimonials.length - staticTestimonials.length}</p>
+      <div>
+        {testimonials.slice(staticTestimonials.length).map((testimonial, index) => (
+          <div key={testimonial.id} style={{ margin: '0.5rem 0', padding: '0.5rem', background: '#f8f9fa', borderRadius: '0.25rem' }}>
+            <strong>{testimonial.author}</strong> - 
+            Image: {testimonial.image ? '✅' : '❌'} - 
+            {testimonial.image && testimonial.image.includes('gravatar.com') ? 'Gravatar' : 
+             testimonial.image && testimonial.image.includes('/uploads/') ? 'Uploaded' : 
+             testimonial.image && testimonial.image.includes('data:image') ? 'Default' : 'Other'}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   if (loading) {
     return (
@@ -196,9 +255,8 @@ const Testimonials = () => {
       <div className="container">
         <h2 className="section-title">What <span>People Say</span></h2>
         
-        <div className="testimonials-stats">
-          <p>Total Testimonials: {testimonials.length} ({staticTestimonials.length} static + {testimonials.length - staticTestimonials.length} dynamic)</p>
-        </div>
+        {/* Debug info - remove in production */}
+        <DebugInfo />
 
         <div className="testimonials-wrapper">
           {testimonials.map((testimonial, index) => (
@@ -218,6 +276,12 @@ const Testimonials = () => {
                 <div className="author-info">
                   <h4>{testimonial.author}</h4>
                   <p>{testimonial.role}</p>
+                  {/* Debug info for each testimonial */}
+                  <small style={{color: '#888', fontSize: '0.7rem'}}>
+                    {testimonial.image.includes('gravatar.com') ? '🟢 Gravatar' : 
+                     testimonial.image.includes('/uploads/') ? '🟡 Uploaded' : 
+                     testimonial.image.includes('data:image') ? '🔴 Default' : '⚫ Other'}
+                  </small>
                 </div>
               </div>
             </div>
@@ -254,13 +318,6 @@ const Testimonials = () => {
           color: #333;
           position: relative;
           min-height: 500px;
-        }
-
-        .testimonials-stats {
-          text-align: center;
-          margin-bottom: 2rem;
-          color: #666;
-          font-size: 0.9rem;
         }
 
         .loading-state, .error-state {
