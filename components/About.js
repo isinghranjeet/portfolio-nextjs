@@ -390,7 +390,7 @@ const About = () => {
                 <span className="button-glow"></span>
                 <div className="mirror-effect"></div>
               </a>
-              <a href="#portfolio" className="cta-button secondary">
+              <a href="#MY PROJECTS" className="cta-button secondary">
                 <i className="fas fa-eye"></i>
                 View My Work
                 <div className="mirror-effect"></div>
