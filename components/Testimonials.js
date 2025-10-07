@@ -6,6 +6,7 @@ const Testimonials = () => {
   const [testimonials, setTestimonials] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   // ✅ 5 Static testimonials
   const staticTestimonials = [
@@ -46,189 +47,391 @@ const Testimonials = () => {
     }
   ];
 
+  // ✅ BETTER IMAGE ERROR HANDLER
+  const handleImageError = (e, testimonialId, originalSrc) => {
+    console.log(`❌ Image failed for testimonial ${testimonialId}, using fallback`);
+    
+    // Use a reliable SVG placeholder
+    e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjMDA3YmZmIi8+Cjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjQwIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+8J+RqDwvdGV4dD4KPC9zdmc+';
+    
+    // Prevent infinite loop
+    e.target.onerror = null;
+  };
+
+  // ✅ GET CORRECT IMAGE URL - UPDATED VERSION
+  const getImageUrl = (item) => {
+    console.log('🖼️ Processing image for:', item.name, item);
+
+    // ✅ OPTION 1: If user uploaded actual photo - Use the UPLOADED image
+    if (item.profileImage && item.profileImage.filename) {
+      const uploadedImageUrl = `https://porthfolio-backend-1.onrender.com/uploads/${item.profileImage.filename}`;
+      console.log('📍 Using UPLOADED PROFILE IMAGE:', uploadedImageUrl);
+      return uploadedImageUrl;
+    }
+
+    // ✅ OPTION 2: Use Gravatar (if available)
+    if (item.imageUrl && item.imageUrl.includes('gravatar.com')) {
+      console.log('📍 Using GRAVATAR URL:', item.imageUrl);
+      return item.imageUrl;
+    }
+
+    // ✅ OPTION 3: Fallback to default avatar
+    console.log('👤 Using DEFAULT AVATAR for:', item.name);
+    return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjMDA3YmZmIi8+Cjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjQwIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+8J+RqDwvdGV4dD4KPC9zdmc+';
+  };
+
   useEffect(() => {
     const fetchTestimonials = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/contact');
-        const data = await res.json();
-        const dynamicTestimonials = Array.isArray(data)
-          ? data.map(item => ({
-              id: item._id || `dynamic-${Math.random()}`,
-              text: item.message,
-              author: item.name,
-              role: item.subject || 'Visitor Feedback',
-              image: item.imageUrl ? `http://localhost:5000${item.imageUrl}` : item.gravatarUrl || 'https://via.placeholder.com/100'
-            }))
-          : [];
-        setTestimonials([...staticTestimonials, ...dynamicTestimonials]);
+        setLoading(true);
+        setError('');
+        
+        const API_URL = 'https://porthfolio-backend-1.onrender.com/api/contact';
+        console.log('🔄 Fetching testimonials from:', API_URL);
+        
+        const response = await fetch(API_URL);
+        console.log('📡 Response status:', response.status);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('✅ API Response received:', data);
+        
+        if (!Array.isArray(data)) {
+          throw new Error('Invalid data format received from API');
+        }
+        
+        console.log(`📊 Found ${data.length} dynamic testimonials`);
+        
+        // ✅ PROCESS DYNAMIC TESTIMONIALS WITH CORRECT IMAGE URL
+        const dynamicTestimonials = data.map((item, index) => {
+          console.log(`🔍 Processing item ${index + 1}:`, {
+            id: item._id,
+            name: item.name,
+            hasUploadedPhoto: !!(item.profileImage && item.profileImage.filename),
+            profileImageFilename: item.profileImage?.filename,
+            hasGravatar: !!(item.imageUrl && item.imageUrl.includes('gravatar.com'))
+          });
+
+          return {
+            id: item._id || `dynamic-${Date.now()}-${index}`,
+            text: item.message || 'No message provided',
+            author: item.name || 'Anonymous',
+            role: item.subject || 'Visitor Feedback',
+            image: getImageUrl(item) // Use the correct image URL
+          };
+        });
+        
+        const allTestimonials = [...staticTestimonials, ...dynamicTestimonials];
+        console.log('🎯 Final testimonials array:', allTestimonials);
+        
+        setTestimonials(allTestimonials);
+        
       } catch (err) {
+        console.error('❌ Error fetching testimonials:', err);
+        setError(err.message);
+        // Fallback to static testimonials only
         setTestimonials(staticTestimonials);
       } finally {
         setLoading(false);
       }
     };
+    
     fetchTestimonials();
   }, []);
 
   useEffect(() => {
     if (!testimonials.length) return;
-    const interval = setInterval(() => setActiveIndex((prev) => (prev + 1) % testimonials.length), 5000);
+    
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % testimonials.length);
+    }, 5000);
+    
     return () => clearInterval(interval);
   }, [testimonials.length]);
 
-  const handleImageError = (e) => (e.target.src = 'https://via.placeholder.com/100/007bff/ffffff?text=👤');
-  const goToTestimonial = (i) => setActiveIndex(i);
+  const goToTestimonial = (index) => setActiveIndex(index);
   const goToNext = () => setActiveIndex((prev) => (prev + 1) % testimonials.length);
   const goToPrev = () => setActiveIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
 
-  if (loading) return (
-    <section className="testimonials-section">
-      <div className="container">
-        <h2 className="section-title">What <span>People Say</span></h2>
-        <p>Loading testimonials...</p>
-      </div>
-    </section>
-  );
+  if (loading) {
+    return (
+      <section className="testimonials-section">
+        <div className="container">
+          <h2 className="section-title">What <span>People Say</span></h2>
+          <div className="loading-state">
+            <p>Loading testimonials...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="testimonials-section">
+        <div className="container">
+          <h2 className="section-title">What <span>People Say</span></h2>
+          <div className="error-state">
+            <p>Error loading testimonials: {error}</p>
+            <p>Showing static testimonials instead.</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="testimonials-section">
       <div className="container">
         <h2 className="section-title">What <span>People Say</span></h2>
+        
+        <div className="testimonials-stats">
+          <p>Showing {testimonials.length} testimonials ({staticTestimonials.length} static + {testimonials.length - staticTestimonials.length} dynamic)</p>
+        </div>
 
         <div className="testimonials-wrapper">
-          {testimonials.map((t, idx) => (
-            <div key={t.id} className={`testimonial-card ${idx === activeIndex ? 'active' : ''}`}>
-              <p className="testimonial-text">"{t.text}"</p>
+          {testimonials.map((testimonial, index) => (
+            <div 
+              key={testimonial.id} 
+              className={`testimonial-card ${index === activeIndex ? 'active' : ''}`}
+            >
+              <p className="testimonial-text">"{testimonial.text}"</p>
               <div className="testimonial-author">
-                <img src={t.image} alt={t.author} onError={handleImageError} />
+                <img 
+                  src={testimonial.image} 
+                  alt={testimonial.author} 
+                  onError={(e) => handleImageError(e, testimonial.id, testimonial.image)}
+                  loading="lazy"
+                  crossOrigin="anonymous"
+                />
                 <div className="author-info">
-                  <h4>{t.author}</h4>
-                  <p>{t.role}</p>
+                  <h4>{testimonial.author}</h4>
+                  <p>{testimonial.role}</p>
                 </div>
               </div>
             </div>
           ))}
 
-          {testimonials.length > 1 && <>
-            <button className="nav-arrow prev" onClick={goToPrev}>‹</button>
-            <button className="nav-arrow next" onClick={goToNext}>›</button>
-            <div className="testimonial-nav">
-              {testimonials.map((_, i) => (
-                <button key={i} className={`testimonial-dot ${i===activeIndex?'active':''}`} onClick={()=>goToTestimonial(i)} />
-              ))}
-            </div>
-          </>}
+          {testimonials.length > 1 && (
+            <>
+              <button className="nav-arrow prev" onClick={goToPrev} aria-label="Previous testimonial">
+                ‹
+              </button>
+              <button className="nav-arrow next" onClick={goToNext} aria-label="Next testimonial">
+                ›
+              </button>
+              
+              <div className="testimonial-nav">
+                {testimonials.map((_, index) => (
+                  <button 
+                    key={index}
+                    className={`testimonial-dot ${index === activeIndex ? 'active' : ''}`}
+                    onClick={() => goToTestimonial(index)}
+                    aria-label={`Go to testimonial ${index + 1}`}
+                  />
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </div>
 
       <style jsx>{`
-   .testimonials-section {
-  background: #f5f5f5; /* slightly warmer off-white */
-  padding: 4rem 0;
-  color: #333;
-  position: relative;
-}
+        .testimonials-section {
+          background: #f5f5f5;
+          padding: 4rem 0;
+          color: #333;
+          position: relative;
+          min-height: 500px;
+        }
 
-.testimonial-card {
-  display: none;
-  padding: 2rem;
-  margin: 1rem auto;
-  background: #0d1b2a; /* dark card */
-  color: #e0e0e0;
-  border-radius: 1rem;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.35); /* stronger shadow for depth */
-  text-align: center;
-  max-width: 700px;
-  transition: all 0.4s ease;
-}
+        .testimonials-stats {
+          text-align: center;
+          margin-bottom: 2rem;
+          color: #666;
+          font-size: 0.9rem;
+        }
 
-.testimonial-text {
-  font-style: italic;
-  margin-bottom: 1.5rem;
-  color: #cfd8dc;
-}
+        .loading-state, .error-state {
+          text-align: center;
+          padding: 2rem;
+          background: white;
+          border-radius: 0.5rem;
+          margin: 2rem 0;
+        }
 
-.testimonial-author {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-}
+        .error-state {
+          background: #fee;
+          border: 1px solid #fcc;
+        }
 
-.testimonial-author img {
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  border: 2px solid #1f77b4;
-  object-fit: cover;
-}
+        .testimonial-card {
+          display: none;
+          padding: 2.5rem;
+          margin: 1rem auto;
+          background: #0d1b2a;
+          color: #e0e0e0;
+          border-radius: 1rem;
+          box-shadow: 0 8px 25px rgba(0,0,0,0.35);
+          text-align: center;
+          max-width: 700px;
+          transition: all 0.4s ease;
+          border-left: 4px solid #1f77b4;
+        }
 
-.author-info h4 {
-  margin: 0;
-  color: #ffffff;
-}
+        .testimonial-card.active {
+          display: block;
+          animation: fadeIn 0.5s ease-in-out;
+        }
 
-.author-info p {
-  margin: 0;
-  color: #b0bec5;
-  font-size: 0.9rem;
-}
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
 
-.nav-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: #1f77b4;
-  color: white;
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
+        .testimonial-text {
+          font-style: italic;
+          margin-bottom: 1.5rem;
+          color: #cfd8dc;
+          line-height: 1.6;
+          font-size: 1.1rem;
+        }
 
-.nav-arrow.prev { left: 1rem; } 
-.nav-arrow.next { right: 1rem; }
+        .testimonial-author {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 1rem;
+        }
 
-.testimonial-nav {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 1rem;
-}
+        .testimonial-author img {
+          width: 70px;
+          height: 70px;
+          border-radius: 50%;
+          border: 3px solid #1f77b4;
+          object-fit: cover;
+          transition: transform 0.3s ease;
+        }
 
-.testimonial-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: #90a4ae;
-  border: none;
-  cursor: pointer;
-}
+        .testimonial-author img:hover {
+          transform: scale(1.05);
+        }
 
-.testimonial-dot.active {
-  background: #1f77b4;
-}
+        .author-info h4 {
+          margin: 0;
+          color: #ffffff;
+          font-size: 1.1rem;
+          font-weight: 600;
+        }
 
-@media (max-width: 768px) {
-  .testimonial-author { flex-direction: column; }
-  .nav-arrow { width: 35px; height: 35px; }
-}
+        .author-info p {
+          margin: 0.25rem 0 0 0;
+          color: #b0bec5;
+          font-size: 0.9rem;
+        }
 
-        .testimonial-card.active { display: block; }
-        .testimonial-text { font-style: italic; margin-bottom: 1.5rem; color: #cfd8dc; }
-        .testimonial-author { display: flex; align-items: center; justify-content: center; gap: 1rem; }
-        .testimonial-author img { width: 70px; height: 70px; border-radius: 50%; border: 2px solid #1f77b4; object-fit: cover; }
-        .author-info h4 { margin:0; color:#ffffff; }
-        .author-info p { margin:0; color:#b0bec5; font-size:0.9rem; }
-        .nav-arrow { position:absolute; top:50%; transform:translateY(-50%); background:#1f77b4;color:white;width:45px;height:45px;border-radius:50%; border:none; font-size:1.5rem; cursor:pointer; }
-        .nav-arrow.prev { left:1rem; } 
-        .nav-arrow.next { right:1rem; }
-        .testimonial-nav { display:flex; justify-content:center; gap:0.5rem; margin-top:1rem; }
-        .testimonial-dot { width:12px;height:12px;border-radius:50%;background:#90a4ae; border:none; cursor:pointer; }
-        .testimonial-dot.active { background:#1f77b4; }
-        @media (max-width:768px) { .testimonial-author { flex-direction:column; } .nav-arrow { width:35px;height:35px; } }
+        .nav-arrow {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          background: #1f77b4;
+          color: white;
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          border: none;
+          font-size: 1.5rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .nav-arrow:hover {
+          background: #1565c0;
+          transform: translateY(-50%) scale(1.1);
+          box-shadow: 0 4px 12px rgba(31, 119, 180, 0.3);
+        }
+
+        .nav-arrow.prev {
+          left: 1rem;
+        }
+
+        .nav-arrow.next {
+          right: 1rem;
+        }
+
+        .testimonial-nav {
+          display: flex;
+          justify-content: center;
+          gap: 0.5rem;
+          margin-top: 2rem;
+        }
+
+        .testimonial-dot {
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          background: #90a4ae;
+          border: none;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .testimonial-dot.active {
+          background: #1f77b4;
+          transform: scale(1.2);
+        }
+
+        .testimonial-dot:hover {
+          background: #1f77b4;
+          transform: scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+          .testimonial-author {
+            flex-direction: column;
+            text-align: center;
+          }
+          
+          .nav-arrow {
+            width: 40px;
+            height: 40px;
+            font-size: 1.2rem;
+          }
+          
+          .nav-arrow.prev {
+            left: 0.5rem;
+          }
+          
+          .nav-arrow.next {
+            right: 0.5rem;
+          }
+          
+          .testimonial-card {
+            padding: 1.5rem;
+            margin: 0.5rem;
+          }
+          
+          .testimonials-section {
+            padding: 2rem 0;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .testimonial-author img {
+            width: 60px;
+            height: 60px;
+          }
+          
+          .testimonial-text {
+            font-size: 1rem;
+          }
+        }
       `}</style>
     </section>
   );
