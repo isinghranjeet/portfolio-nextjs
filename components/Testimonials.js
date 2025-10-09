@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import useAOS from '../hooks/useAOS';
 
 const Testimonials = () => {
@@ -7,6 +7,8 @@ const Testimonials = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isPaused, setIsPaused] = useState(false);
+  const pauseTimeoutRef = useRef(null);
 
   // ✅ 5 Static testimonials
   const staticTestimonials = [
@@ -47,7 +49,7 @@ const Testimonials = () => {
     }
   ];
 
-  // ✅ BETTER IMAGE ERROR HANDLER
+  // ✅ SIMPLIFIED IMAGE ERROR HANDLER
   const handleImageError = (e, testimonialId, originalSrc) => {
     console.log(`❌ Image failed for testimonial ${testimonialId}, using fallback`);
     
@@ -58,25 +60,36 @@ const Testimonials = () => {
     e.target.onerror = null;
   };
 
-  // ✅ GET CORRECT IMAGE URL - UPDATED VERSION
+  // ✅ FIXED GET IMAGE URL - CHECK MULTIPLE POSSIBLE PATHS
   const getImageUrl = (item) => {
     console.log('🖼️ Processing image for:', item.name, item);
 
-    // ✅ OPTION 1: If user uploaded actual photo - Use the UPLOADED image
+    // ✅ Check if profileImage exists and has filename
     if (item.profileImage && item.profileImage.filename) {
-      const uploadedImageUrl = `https://porthfolio-backend-1.onrender.com/uploads/${item.profileImage.filename}`;
-      console.log('📍 Using UPLOADED PROFILE IMAGE:', uploadedImageUrl);
-      return uploadedImageUrl;
+      // Try different possible upload paths
+      const possiblePaths = [
+        `https://porthfolio-backend-1.onrender.com/uploads/${item.profileImage.filename}`,
+        `https://porthfolio-backend-1.onrender.com/api/uploads/${item.profileImage.filename}`,
+        `https://porthfolio-backend-1.onrender.com/images/${item.profileImage.filename}`,
+        `https://porthfolio-backend-1.onrender.com/api/images/${item.profileImage.filename}`,
+        `https://porthfolio-backend-1.onrender.com/static/${item.profileImage.filename}`,
+        `https://porthfolio-backend-1.onrender.com/api/static/${item.profileImage.filename}`
+      ];
+      
+      // Return the first path (we'll handle errors in the image onError)
+      const imageUrl = possiblePaths[0];
+      console.log('📍 Using UPLOADED PROFILE IMAGE:', imageUrl);
+      return imageUrl;
     }
 
-    // ✅ OPTION 2: Use Gravatar (if available)
-    if (item.imageUrl && item.imageUrl.includes('gravatar.com')) {
-      console.log('📍 Using GRAVATAR URL:', item.imageUrl);
-      return item.imageUrl;
+    // ✅ If no uploaded photo, use Gravatar as fallback
+    if (item.gravatarUrl && item.gravatarUrl.includes('gravatar.com')) {
+      console.log('📍 Using GRAVATAR as fallback:', item.gravatarUrl);
+      return item.gravatarUrl;
     }
 
-    // ✅ OPTION 3: Fallback to default avatar
-    console.log('👤 Using DEFAULT AVATAR for:', item.name);
+    // ✅ Final fallback to default avatar
+    console.log('👤 No photo found, using DEFAULT AVATAR for:', item.name);
     return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjMDA3YmZmIi8+Cjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjQwIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+8J+RqDwvdGV4dD4KPC9zdmc+';
   };
 
@@ -110,9 +123,9 @@ const Testimonials = () => {
           console.log(`🔍 Processing item ${index + 1}:`, {
             id: item._id,
             name: item.name,
-            hasUploadedPhoto: !!(item.profileImage && item.profileImage.filename),
+            hasProfileImage: !!item.profileImage,
             profileImageFilename: item.profileImage?.filename,
-            hasGravatar: !!(item.imageUrl && item.imageUrl.includes('gravatar.com'))
+            hasGravatar: !!(item.gravatarUrl && item.gravatarUrl.includes('gravatar.com'))
           });
 
           return {
@@ -120,7 +133,7 @@ const Testimonials = () => {
             text: item.message || 'No message provided',
             author: item.name || 'Anonymous',
             role: item.subject || 'Visitor Feedback',
-            image: getImageUrl(item) // Use the correct image URL
+            image: getImageUrl(item)
           };
         });
         
@@ -142,19 +155,58 @@ const Testimonials = () => {
     fetchTestimonials();
   }, []);
 
+  // ✅ AUTO-SLIDE FUNCTIONALITY WITH PAUSE FEATURE (HIDDEN)
   useEffect(() => {
-    if (!testimonials.length) return;
+    if (!testimonials.length || isPaused) return;
     
     const interval = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % testimonials.length);
     }, 5000);
     
     return () => clearInterval(interval);
-  }, [testimonials.length]);
+  }, [testimonials.length, isPaused]);
 
-  const goToTestimonial = (index) => setActiveIndex(index);
-  const goToNext = () => setActiveIndex((prev) => (prev + 1) % testimonials.length);
-  const goToPrev = () => setActiveIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+  // ✅ CLEAR TIMEOUT ON COMPONENT UNMOUNT
+  useEffect(() => {
+    return () => {
+      if (pauseTimeoutRef.current) {
+        clearTimeout(pauseTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // ✅ GO TO SPECIFIC TESTIMONIAL WITH 10 SECOND PAUSE (HIDDEN)
+  const goToTestimonial = (index) => {
+    setActiveIndex(index);
+    setIsPaused(true);
+    
+    // Clear existing timeout
+    if (pauseTimeoutRef.current) {
+      clearTimeout(pauseTimeoutRef.current);
+    }
+    
+    // Set new timeout to resume auto-slide after 10 seconds
+    pauseTimeoutRef.current = setTimeout(() => {
+      setIsPaused(false);
+      console.log('🔄 Auto-slide resumed after 10 seconds');
+    }, 10000); // 10 seconds
+  };
+
+  const goToNext = () => {
+    setIsPaused(false);
+    if (pauseTimeoutRef.current) {
+      clearTimeout(pauseTimeoutRef.current);
+    }
+    setActiveIndex((prev) => (prev + 1) % testimonials.length);
+  };
+
+  const goToPrev = () => {
+    setIsPaused(false);
+    if (pauseTimeoutRef.current) {
+      clearTimeout(pauseTimeoutRef.current);
+    }
+    setActiveIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+  };
 
   if (loading) {
     return (
@@ -176,7 +228,7 @@ const Testimonials = () => {
           <h2 className="section-title">What <span>People Say</span></h2>
           <div className="error-state">
             <p>Error loading testimonials: {error}</p>
-          
+            <p>Showing static testimonials only</p>
           </div>
         </div>
       </section>
@@ -187,10 +239,6 @@ const Testimonials = () => {
     <section className="testimonials-section">
       <div className="container">
         <h2 className="section-title">What <span>People Say</span></h2>
-        
-        <div className="testimonials-stats">
-        
-        </div>
 
         <div className="testimonials-wrapper">
           {testimonials.map((testimonial, index) => (
@@ -246,13 +294,6 @@ const Testimonials = () => {
           color: #333;
           position: relative;
           min-height: 500px;
-        }
-
-        .testimonials-stats {
-          text-align: center;
-          margin-bottom: 2rem;
-          color: #666;
-          font-size: 0.9rem;
         }
 
         .loading-state, .error-state {
