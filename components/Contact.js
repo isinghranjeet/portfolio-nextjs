@@ -17,6 +17,14 @@ const ContactForm = () => {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
 
+  // Contact details
+  const contactInfo = {
+    phone: '+919315058665',
+    email: 'rsinghranjeet7428@gmail.com',
+    whatsappPreMessage: 'Hello Ranjeet! I came across your portfolio and would like to connect with you.',
+    location: 'New Delhi, India'
+  };
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -110,7 +118,7 @@ const ContactForm = () => {
       const data = await response.json();
 
       if (data.success) {
-        setFormStatus({ type: 'success', message: '✅ Your message has been sent successfully!' });
+        setFormStatus({ type: 'success', message: '✅ Your message has been sent successfully! I might feature your feedback in my testimonials.' });
         setFormData({ name: '', email: '', subject: '', message: '' });
         setProfileImage(null);
         setPreviewImage(null);
@@ -136,10 +144,28 @@ const ContactForm = () => {
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
+  // WhatsApp contact function
+  const handleWhatsAppClick = () => {
+    const encodedMessage = encodeURIComponent(contactInfo.whatsappPreMessage);
+    const whatsappUrl = `https://wa.me/${contactInfo.phone}?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
+  // Email contact function
+  const handleEmailClick = () => {
+    const subject = encodeURIComponent('Connection Request from Portfolio');
+    const body = encodeURIComponent(`Hello Ranjeet,\n\nI came across your portfolio and would like to connect with you.\n\nBest regards,\n[Your Name]`);
+    const mailtoUrl = `mailto:${contactInfo.email}?subject=${subject}&body=${body}`;
+    window.location.href = mailtoUrl;
+  };
+
   return (
     <section id="contact" className="section">
       <div className="container">
         <h2 className="section-title">Contact <span>Me</span></h2>
+        
+      
+
         <div className="contact-content">
           <div className="contact-info" data-aos="fade-right">
             <h3>Let's Talk About Your Project</h3>
@@ -147,9 +173,37 @@ const ContactForm = () => {
               Feel free to reach out if you're looking for a developer, have a question, or just want to connect.
             </p>
             <div className="contact-details">
-              <div><i className="fas fa-map-marker-alt"></i> <span>New Delhi, India</span></div>
-              <div><i className="fas fa-envelope"></i> <span>rsinghranjeet7428@gmail.com</span></div>
-              <div><i className="fas fa-phone"></i> <span>+91 9315058665</span></div>
+              <div><i className="fas fa-map-marker-alt"></i> <span>{contactInfo.location}</span></div>
+              <div><i className="fas fa-envelope"></i> <span>{contactInfo.email}</span></div>
+              <div><i className="fas fa-phone"></i> <span>{contactInfo.phone}</span></div>
+            </div>
+            
+            {/* Social Contact Icons */}
+            <div className="social-contact-icons">
+              <div className="social-contact-title">Connect with me:</div>
+              <div className="social-contact-buttons">
+                <button 
+                  className="social-contact-btn whatsapp-btn"
+                  onClick={handleWhatsAppClick}
+                  title="Chat on WhatsApp"
+                >
+                  <i className="fab fa-whatsapp"></i>
+                </button>
+                <button 
+                  className="social-contact-btn email-btn"
+                  onClick={handleEmailClick}
+                  title="Send Email"
+                >
+                  <i className="fas fa-envelope"></i>
+                </button>
+                <a 
+                  href={`tel:${contactInfo.phone}`}
+                  className="social-contact-btn phone-btn"
+                  title="Call Me"
+                >
+                  <i className="fas fa-phone"></i>
+                </a>
+              </div>
             </div>
           </div>
 
@@ -158,7 +212,31 @@ const ContactForm = () => {
               <input type="text" name="name" placeholder="Your Name" value={formData.name} onChange={handleChange} required disabled={isSubmitting} />
               <input type="email" name="email" placeholder="Your Email" value={formData.email} onChange={handleChange} required disabled={isSubmitting} />
               <input type="text" name="subject" placeholder="Subject" value={formData.subject} onChange={handleChange} disabled={isSubmitting} />
-              <textarea name="message" placeholder="Your Message" rows="5" value={formData.message} onChange={handleChange} required disabled={isSubmitting}></textarea>
+              
+              {/* Enhanced Message Section with Testimonial Integration */}
+              <div className="message-section">
+                <label className="message-label">
+                  Your Message <span className="required">*</span>
+                  <span className="char-count">{formData.message.length}/500</span>
+                </label>
+                <div className="testimonial-notice">
+                  <i className="fas fa-star"></i>
+                  <div>
+                    <strong>Featured Testimonials:</strong> Share your honest feedback - selected messages will be displayed in my testimonials section!
+                  </div>
+                </div>
+                <textarea 
+                  name="message" 
+                  placeholder="Write your message here... (e.g. Project idea, collaboration, or feedback)"
+                  rows="6" 
+                  value={formData.message} 
+                  onChange={handleChange} 
+                  maxLength={500}
+                  required 
+                  disabled={isSubmitting}
+                  className="message-textarea"
+                ></textarea>
+              </div>
 
               {/* Enhanced Image Upload Section */}
               <div className="image-upload-section">
@@ -316,6 +394,134 @@ const ContactForm = () => {
           border: 1px solid #fecaca; 
         }
         
+     
+       
+        
+   
+        .whatsapp-btn {
+          background: #25D366;
+        }
+        .whatsapp-btn:hover {
+          background: #128C7E;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+        }
+        .email-btn {
+          background: #EA4335;
+        }
+        .email-btn:hover {
+          background: #D14836;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(234, 67, 53, 0.4);
+        }
+        
+        /* Social Contact Icons */
+        .social-contact-icons {
+          margin-top: 2rem;
+          padding-top: 1.5rem;
+          border-top: 1px solid #e5e7eb;
+        }
+        .social-contact-title {
+          font-weight: 600;
+          margin-bottom: 1rem;
+          color: #374151;
+        }
+        .social-contact-buttons {
+          display: flex;
+          gap: 0.75rem;
+        }
+        .social-contact-btn {
+          width: 50px;
+          height: 50px;
+          border: none;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          font-size: 1.25rem;
+          color: white;
+          text-decoration: none;
+        }
+        .social-contact-btn:hover {
+          transform: translateY(-3px) scale(1.1);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        .phone-btn {
+          background: #007bff;
+        }
+        .phone-btn:hover {
+          background: #0056b3;
+        }
+        
+        /* Enhanced Message Section Styles */
+        .message-section {
+          margin-bottom: 1.5rem;
+        }
+        .message-label {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 0.5rem;
+          font-weight: 600;
+          color: #374151;
+          font-size: 0.875rem;
+        }
+        .required {
+          color: #ef4444;
+        }
+        .char-count {
+          font-size: 0.75rem;
+          color: #6b7280;
+          font-weight: normal;
+        }
+        
+        /* Testimonial Notice Styles */
+        .testimonial-notice {
+          background: #fff3cd;
+          border: 1px solid #ffeaa7;
+          border-radius: 0.5rem;
+          padding: 0.75rem 1rem;
+          margin-bottom: 1rem;
+          font-size: 0.875rem;
+          color: #856404;
+          display: flex;
+          align-items: flex-start;
+          gap: 0.5rem;
+          line-height: 1.4;
+        }
+        .testimonial-notice i {
+          color: #ffc107;
+          margin-top: 0.1rem;
+          flex-shrink: 0;
+        }
+        
+        .message-textarea {
+          width: 100%;
+          padding: 1rem;
+          border: 2px solid #e5e7eb;
+          border-radius: 0.75rem;
+          font-size: 1rem;
+          font-family: inherit;
+          resize: vertical;
+          min-height: 120px;
+          transition: all 0.3s ease;
+          background: #fafafa;
+          box-sizing: border-box;
+        }
+        .message-textarea:focus {
+          outline: none;
+          border-color: #007bff;
+          background: white;
+          box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+        .message-textarea:disabled {
+          background: #f3f4f6;
+          cursor: not-allowed;
+          opacity: 0.7;
+        }
+        
         .image-upload-section {
           margin-bottom: 1.5rem;
         }
@@ -454,6 +660,27 @@ const ContactForm = () => {
           }
           .upload-area {
             padding: 1.5rem;
+          }
+          .message-label {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.25rem;
+          }
+          .message-textarea {
+            min-height: 100px;
+          }
+          .testimonial-notice {
+            padding: 0.75rem;
+            font-size: 0.8rem;
+          }
+          .quick-contact-buttons {
+            flex-direction: column;
+          }
+          .quick-btn {
+            justify-content: center;
+          }
+          .social-contact-buttons {
+            justify-content: center;
           }
         }
       `}</style>

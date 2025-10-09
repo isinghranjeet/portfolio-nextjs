@@ -100,7 +100,7 @@ const Hero = () => {
           <div className="hero-image relative" data-aos="fade-left">
             <div className="w-64 h-64 lg:w-80 lg:h-80 rounded-full overflow-hidden border-4 border-purple-500 shadow-xl hover:scale-105 transition transform">
               <img
-                src="https://media.licdn.com/dms/image/v2/D5603AQGDt02qOvcBMA/profile-displayphoto-shrink_200_200/B56ZUh8ITVHEAk-/0/1740031169550?e=1759968000&v=beta&t=7FLYOg2O8Rm0znnax3i1AWkasXREnEa-N5DRSrsYy9E"
+                src="profile-picture1.jpg"
                 alt="Ranjeet Singh"
                 className="w-full h-full object-cover"
               />
