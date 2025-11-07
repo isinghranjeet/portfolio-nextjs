@@ -40,13 +40,13 @@ const Testimonials = () => {
       role: "Fellow Bootcamp Participant",
       image: "https://media.licdn.com/dms/image/v2/D5603AQEFpIGrVjXuGA/profile-displayphoto-shrink_200_200/B56ZSZHrxpHoAY-/0/1737735717828?e=1759968000&v=beta&t=nzsCnen5tPXhFuD8Lw3OeNWV6qNTuWauzJFtrwSnEKA"
     },
-    {
-      id: 5,
-      text: "I mentored Ranjeet during his third year project on Java development. He consistently demonstrated excellent problem-solving skills and a strong understanding of programming concepts. His projects are well-structured and reflect his dedication to learning.",
-      author: "Dr. Namrata Vij",
-      role: "Project Mentor (Java)",
-      image: "https://media.licdn.com/dms/image/v2/D5603AQFNADpqwuNAdw/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1728395726028?e=1760572800&v=beta&t=3n-xoTpRRfa0wrzGpVOsywC-YEDQCqfN0nJfI9fs0L0"
-    }
+    // {
+    //   id: 5,
+    //   text: "I mentored Ranjeet during his third year project on Java development. He consistently demonstrated excellent problem-solving skills and a strong understanding of programming concepts. His projects are well-structured and reflect his dedication to learning.",
+    //   author: "Dr. Namrata Vij",
+    //   role: "Project Mentor (Java)",
+    //   image: "https://media.licdn.com/dms/image/v2/D5603AQFNADpqwuNAdw/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1728395726028?e=1760572800&v=beta&t=3n-xoTpRRfa0wrzGpVOsywC-YEDQCqfN0nJfI9fs0L0"
+    // }
   ];
 
   // ✅ SIMPLIFIED IMAGE ERROR HANDLER
