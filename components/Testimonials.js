@@ -12,20 +12,20 @@ const Testimonials = () => {
 
   // ✅ 5 Static testimonials
   const staticTestimonials = [
-    {
-      id: 1,
-      text: "Ranjeet was an exceptional student in my web development course. His projects consistently demonstrated creativity, technical skill, and attention to detail. He has a strong foundation in frontend technologies and learns quickly.",
-      author: "Dr. Parminder Kaur",
-      role: "Professor, Computer Science Department",
-      image: "https://media.licdn.com/dms/image/v2/D5603AQE08Z7G0RX4Eg/profile-displayphoto-scale_200_200/B56ZjstLEKHcAY-/0/1756317923482?e=1759968000&v=beta&t=PNL02VW75unsQ4zU7VMLDxDHJpTBhfPuaCET2ke07Hw"
-    },
-    {
-      id: 2,
-      text: "During our college hackathon, Ranjeet contributed significantly to our team's project. His problem-solving abilities and clean code practices helped us secure second place. He's a dedicated team player with strong technical skills.",
-      author: "Rohit Sharma",
-      role: "Teammate, Hackathon Project",
-      image: "https://media.licdn.com/dms/image/v2/D5603AQHbSzmLdG9F2Q/profile-displayphoto-scale_200_200/B56ZioCTFCG0AY-/0/1755165832979?e=1759968000&v=beta&t=Xi8N3Wg4NSsfsWtJ7vyZY6myfB6lg5RxX247SnQVmhw"
-    },
+    // {
+    //   id: 1,
+    //   text: "Ranjeet was an exceptional student in my web development course. His projects consistently demonstrated creativity, technical skill, and attention to detail. He has a strong foundation in frontend technologies and learns quickly.",
+    //   author: "Dr. Parminder Kaur",
+    //   role: "Professor, Computer Science Department",
+    //   image: "https://media.licdn.com/dms/image/v2/D5603AQE08Z7G0RX4Eg/profile-displayphoto-scale_200_200/B56ZjstLEKHcAY-/0/1756317923482?e=1759968000&v=beta&t=PNL02VW75unsQ4zU7VMLDxDHJpTBhfPuaCET2ke07Hw"
+    // },
+    // {
+    //   id: 2,
+    //   text: "During our college hackathon, Ranjeet contributed significantly to our team's project. His problem-solving abilities and clean code practices helped us secure second place. He's a dedicated team player with strong technical skills.",
+    //   author: "Rohit Sharma",
+    //   role: "Teammate, Hackathon Project",
+    //   image: "https://media.licdn.com/dms/image/v2/D5603AQHbSzmLdG9F2Q/profile-displayphoto-scale_200_200/B56ZioCTFCG0AY-/0/1755165832979?e=1759968000&v=beta&t=Xi8N3Wg4NSsfsWtJ7vyZY6myfB6lg5RxX247SnQVmhw"
+    // },
     {
       id: 3,
       text: "I mentored Ranjeet during his third year project on web development. He showed remarkable growth throughout the project, implementing complex features with minimal guidance. His portfolio projects reflect his passion for creating user-friendly interfaces.",
@@ -37,7 +37,7 @@ const Testimonials = () => {
       id: 4,
       text: "As a fellow coding bootcamp participant, I witnessed Ranjeet's dedication to mastering web technologies. He consistently helped others understand complex concepts and built impressive projects that showcased both technical skills and design sense.",
       author: "Narinder Kaur",
-      role: "Fellow Bootcamp Participant",
+      role: "Full Stack Mentor",
       image: "https://media.licdn.com/dms/image/v2/D5603AQEFpIGrVjXuGA/profile-displayphoto-shrink_200_200/B56ZSZHrxpHoAY-/0/1737735717828?e=1759968000&v=beta&t=nzsCnen5tPXhFuD8Lw3OeNWV6qNTuWauzJFtrwSnEKA"
     },
     // {
