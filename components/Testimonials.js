@@ -26,13 +26,13 @@ const Testimonials = () => {
     //   role: "Teammate, Hackathon Project",
     //   image: "https://media.licdn.com/dms/image/v2/D5603AQHbSzmLdG9F2Q/profile-displayphoto-scale_200_200/B56ZioCTFCG0AY-/0/1755165832979?e=1759968000&v=beta&t=Xi8N3Wg4NSsfsWtJ7vyZY6myfB6lg5RxX247SnQVmhw"
     // },
-    {
-      id: 3,
-      text: "I mentored Ranjeet during his third year project on web development. He showed remarkable growth throughout the project, implementing complex features with minimal guidance. His portfolio projects reflect his passion for creating user-friendly interfaces.",
-      author: "Rajinder Kaur",
-      role: "Developer & Project Mentor",
-      image: "https://media.licdn.com/dms/image/v2/D5603AQExFDhhMwX21w/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1729781519140?e=1759968000&v=beta&t=pPtDEC038wEuiexs3rhU4tRbSbIfcF9rqbfphs6eXXI"
-    },
+    // {
+    //   id: 3,
+    //   text: "I mentored Ranjeet during his third year project on web development. He showed remarkable growth throughout the project, implementing complex features with minimal guidance. His portfolio projects reflect his passion for creating user-friendly interfaces.",
+    //   author: "Rajinder Kaur",
+    //   role: "Developer & Project Mentor",
+    //   image: "https://media.licdn.com/dms/image/v2/D5603AQExFDhhMwX21w/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1729781519140?e=1759968000&v=beta&t=pPtDEC038wEuiexs3rhU4tRbSbIfcF9rqbfphs6eXXI"
+    // },
     {
       id: 4,
       text: "As a fellow coding bootcamp participant, I witnessed Ranjeet's dedication to mastering web technologies. He consistently helped others understand complex concepts and built impressive projects that showcased both technical skills and design sense.",
