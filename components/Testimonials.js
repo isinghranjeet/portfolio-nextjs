@@ -34,7 +34,7 @@ const Testimonials = () => {
     //   image: "https://media.licdn.com/dms/image/v2/D5603AQExFDhhMwX21w/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1729781519140?e=1759968000&v=beta&t=pPtDEC038wEuiexs3rhU4tRbSbIfcF9rqbfphs6eXXI"
     // },
     {
-      id: 4,
+      id: 4, 
       text: "As a fellow coding bootcamp participant, I witnessed Ranjeet's dedication to mastering web technologies. He consistently helped others understand complex concepts and built impressive projects that showcased both technical skills and design sense.",
       author: "Narinder Kaur",
       role: "Full Stack Mentor",
