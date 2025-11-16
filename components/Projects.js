@@ -550,9 +550,9 @@ const Projects = () => {
       category: "web",
       featured: true,
       links: {
-        view: "#",
-        demo: "",
-        github: "portfolio-nextjs-o9lx.vercel.app"
+        view: "portfolio-nextjs-o9lx.vercel.app",
+        demo: "portfolio-nextjs-o9lx.vercel.app",
+        github: "https://github.com/isinghranjeet/portfolio-nextjs"
       }
     },
     {
