@@ -173,8 +173,8 @@ const Projects = () => {
       category: "design",
       featured: true,
       links: {
-        view: "#",
-        demo: "#",
+        view: "https://www.easytorent.in/",
+        demo: "https://www.easytorent.in/",
         github: "#"
       }
     },
